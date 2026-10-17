@@ -1,619 +1,78 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CS333 Part 2 – Dubai Real Estate (Vega-Lite)</title>
-<script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
-<style>
- body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#1f2328;background:#fff;max-width:1000px;margin:0 auto;padding:16px;line-height:1.5}
- h1{font-size:1.6rem;margin-bottom:.2rem} h2{margin-top:2.4rem;border-bottom:1px solid #ddd;padding-bottom:.3rem}
- .chart{overflow-x:auto} .answer{background:#f4f6f8;border-left:4px solid #4c78a8;padding:10px 14px;margin-top:12px}
- .note{color:#57606a;font-size:.92rem}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CS333 Part 2 – Dubai Real Estate (Vega-Lite)</title>
+  <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; color: #1f2328; max-width: 1000px; margin: 0 auto; padding: 16px; line-height: 1.5; }
+    h2 { margin-top: 2.4rem; border-bottom: 1px solid #ddd; padding-bottom: .3rem; }
+    .chart { overflow-x: auto; }
+    .answer { background: #f4f6f8; border-left: 4px solid #4c78a8; padding: 10px 14px; margin-top: 12px; }
+    .note { color: #57606a; font-size: .92rem; }
+  </style>
 </head>
 <body>
-<h1>Dubai Land Department transactions, 2015–2026</h1>
-<p class="note">CS333 Part 2 (Vega-Lite). Group members: NAME 1, NAME 2, NAME 3, NAME 4, NAME 5. All charts use transactions registered from 1 January 2015 to 31 August 2026. Dates are read and grouped in UTC, so the results are the same in every time zone.</p>
+  <h1>Dubai Land Department transactions, 2015–2026</h1>
+  <p class="note">CS333 Part 2 (Vega-Lite). Group members: NAME 1, NAME 2, NAME 3, NAME 4, NAME 5.
+  All charts use transactions registered from 1 January 2015 to 31 August 2026.
+  Dates are read and grouped in UTC, so the results are the same in every time zone.</p>
 
-<h2>Task 1: Transactions by day of the week</h2>
-<div id="task1" class="chart"></div>
-<div class="answer"><b>How many transactions were registered on Fridays?</b> 6,553 transactions were registered on Fridays between 1 January 2015 and 31 August 2026. Friday is low mainly because it was part of the UAE weekend until January 2022: there were only 299 Friday transactions in 2015–2021, then 740 in 2022, rising to about 1,750 a year in 2024–2025. No transactions fall on Saturday or Sunday, so both bars are zero, while Monday (20,126) is roughly 1.5 times any other day. Bars on a common baseline make these counts easy to compare, and the zero labels show the empty weekend days explicitly.</div>
+  <h2>Task 1: Transactions by day of the week</h2>
+  <div id="task1" class="chart"></div>
+  <div class="answer"><b>How many transactions were registered on Fridays?</b> (Member 2's answer)</div>
 
-<h2>Task 2: Monthly sales, off-plan vs existing properties</h2>
-<div id="task2" class="chart"></div>
-<div class="answer"><b>Which month had the most off-plan sales?</b> Off-plan sales were highest in September 2025, with 706 sales (existing properties had 316 that month). The next highest months were October 2024 (665) and December 2025 (656). Off-plan sales exceeded existing sales in every month of 2024 and 2025, while April–May 2020 shows the COVID-19 dip for both.</div>
+  <h2>Task 2: Monthly sales, off-plan vs existing properties</h2>
+  <div id="task2" class="chart"></div>
+  <div class="answer"><b>Which month had the most off-plan sales?</b> (Member 3's answer)</div>
 
-<h2>Task 3: Median price per m² of units and villas by community</h2>
-<div id="task3" class="chart"></div>
-<div class="answer"><b>Which community has the most sales of units and villas?</b> Al Barsha South Fourth (community 681, around Jumeirah Village Circle) has the most unit and villa sales: 3,925, with a median of about 12,900 AED/m². Business Bay (3,634) and Marsa Dubai (2,955) follow. The map is <b>not</b> effective for finding this community: colour encodes the median price, not the number of sales, so the only way to find it is to hover over every community, and as a mid-priced community it does not stand out. A bar chart of sales per community, sorted from highest to lowest, would show the answer at a glance. On the other hand, the map does its intended job well: communities with fewer than 10 sales are grey so unreliable medians are not coloured, and price classes with round breaks keep the skewed prices (most 10,000–25,000 AED/m², a few up to 75,000) spread across the colour range.</div>
+  <h2>Task 3: Median price per m² of units and villas by community</h2>
+  <div id="task3" class="chart"></div>
+  <div class="answer">
+    <p><b>Which community has the largest number of sales of units and villas?</b><br>
+    Al Barsha South Fourth (community 681, around Jumeirah Village Circle) has the most sales of units and villas: 3,925 between 1 January 2015 and 31 August 2026, with a median of about 12,900 AED/m². It is followed by Business Bay (3,634) and Marsa Dubai (2,955). This matches Part 1.</p>
 
-<script>
-const task1 = {
- "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
- "title": {
-  "text": "Transactions by day of the week",
-  "subtitle": "Dubai Land Department, 1 Jan 2015 – 31 Aug 2026 (all transaction types)"
- },
- "width": 560,
- "height": 320,
- "data": {
-  "url": "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/transactions.csv",
-  "format": {
-   "type": "csv",
-   "parse": {
-    "instance_date": "utc:'%Y-%m-%d'",
-    "meter_sale_price": "number",
-    "actual_worth": "number",
-    "procedure_area": "number",
-    "comm_num": "string"
-   }
-  }
- },
- "transform": [
-  {
-   "filter": {
-    "field": "instance_date",
-    "range": [
-     {
-      "year": 2015,
-      "month": 1,
-      "date": 1,
-      "utc": true
-     },
-     {
-      "year": 2026,
-      "month": 8,
-      "date": 31,
-      "utc": true
-     }
-    ]
-   }
-  },
-  {
-   "calculate": "utcFormat(datum.instance_date,'%A')",
-   "as": "day"
-  },
-  {
-   "aggregate": [
-    {
-     "op": "count",
-     "as": "transactions"
-    }
-   ],
-   "groupby": [
-    "day"
-   ]
-  },
-  {
-   "impute": "transactions",
-   "key": "day",
-   "keyvals": [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday"
-   ],
-   "value": 0
-  }
- ],
- "encoding": {
-  "x": {
-   "field": "day",
-   "type": "ordinal",
-   "sort": [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday"
-   ],
-   "title": "Day of the week",
-   "axis": {
-    "labelAngle": 0
-   }
-  },
-  "y": {
-   "field": "transactions",
-   "type": "quantitative",
-   "title": "Number of transactions"
-  },
-  "tooltip": [
-   {
-    "field": "day",
-    "title": "Day"
-   },
-   {
-    "field": "transactions",
-    "title": "Transactions",
-    "format": ","
-   }
-  ]
- },
- "layer": [
-  {
-   "mark": "bar",
-   "encoding": {
-    "color": {
-     "field": "day",
-     "type": "nominal",
-     "sort": [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday"
-     ],
-     "scale": {
-      "domain": [
-       "Monday",
-       "Tuesday",
-       "Wednesday",
-       "Thursday",
-       "Friday",
-       "Saturday",
-       "Sunday"
-      ],
-      "scheme": "tableau10"
-     },
-     "legend": null
-    }
-   }
-  },
-  {
-   "mark": {
-    "type": "text",
-    "dy": -7
-   },
-   "encoding": {
-    "text": {
-     "field": "transactions",
-     "format": ","
-    }
-   }
-  }
- ]
-};
-const task2 = {
- "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
- "title": {
-  "text": "Monthly sales: off-plan vs existing properties",
-  "subtitle": "Sales only, Jan 2015 – Aug 2026"
- },
- "width": 820,
- "height": 340,
- "data": {
-  "url": "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/transactions.csv",
-  "format": {
-   "type": "csv",
-   "parse": {
-    "instance_date": "utc:'%Y-%m-%d'",
-    "meter_sale_price": "number",
-    "actual_worth": "number",
-    "procedure_area": "number",
-    "comm_num": "string"
-   }
-  }
- },
- "transform": [
-  {
-   "filter": {
-    "field": "instance_date",
-    "range": [
-     {
-      "year": 2015,
-      "month": 1,
-      "date": 1,
-      "utc": true
-     },
-     {
-      "year": 2026,
-      "month": 8,
-      "date": 31,
-      "utc": true
-     }
-    ]
-   }
-  },
-  {
-   "filter": "datum.trans_group_en === 'Sales'"
-  },
-  {
-   "timeUnit": "utcyearmonth",
-   "field": "instance_date",
-   "as": "month"
-  },
-  {
-   "aggregate": [
-    {
-     "op": "count",
-     "as": "sales"
-    }
-   ],
-   "groupby": [
-    "month",
-    "reg_type_en"
-   ]
-  }
- ],
- "encoding": {
-  "x": {
-   "field": "month",
-   "type": "temporal",
-   "title": "Month",
-   "scale": {
-    "type": "utc",
-    "domain": [
-     {
-      "year": 2015,
-      "month": 1,
-      "date": 1,
-      "utc": true
-     },
-     {
-      "year": 2026,
-      "month": 8,
-      "date": 1,
-      "utc": true
-     }
-    ]
-   },
-   "axis": {
-    "format": "%Y",
-    "tickCount": {
-     "interval": "year",
-     "step": 1
-    },
-    "labelAngle": 0
-   }
-  },
-  "y": {
-   "field": "sales",
-   "type": "quantitative",
-   "title": "Number of sales"
-  },
-  "color": {
-   "field": "reg_type_en",
-   "type": "nominal",
-   "title": "Property status",
-   "scale": {
-    "domain": [
-     "Off-Plan Properties",
-     "Existing Properties"
-    ],
-    "range": [
-     "#d95f02",
-     "#1b9e77"
-    ]
-   },
-   "legend": {
-    "orient": "top"
-   }
-  }
- },
- "layer": [
-  {
-   "mark": {
-    "type": "line",
-    "strokeWidth": 1.6
-   }
-  },
-  {
-   "params": [
-    {
-     "name": "hover",
-     "select": {
-      "type": "point",
-      "fields": [
-       "month"
-      ],
-      "nearest": true,
-      "on": "pointerover",
-      "clear": "pointerout"
-     }
-    }
-   ],
-   "mark": {
-    "type": "point",
-    "filled": true,
-    "size": 40
-   },
-   "encoding": {
-    "opacity": {
-     "condition": {
-      "param": "hover",
-      "empty": false,
-      "value": 1
-     },
-     "value": 0
-    },
-    "tooltip": [
-     {
-      "field": "month",
-      "type": "temporal",
-      "title": "Month",
-      "format": "%B %Y",
-      "formatType": "utc"
-     },
-     {
-      "field": "reg_type_en",
-      "title": "Status"
-     },
-     {
-      "field": "sales",
-      "title": "Sales",
-      "format": ","
-     }
-    ]
-   }
-  }
- ]
-};
-const task3 = {
- "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
- "title": {
-  "text": "Median sale price per m² of units and villas by community",
-  "subtitle": [
-   "Sales of units and villas, 1 Jan 2015 – 31 Aug 2026. Hover a community for its name, sales and median price.",
-   "Communities with fewer than 10 sales are grey: a median of so few sales is not reliable."
-  ]
- },
- "width": 680,
- "height": 600,
- "projection": {
-  "type": "mercator",
-  "fit": {
-   "type": "Feature",
-   "geometry": {
-    "type": "MultiPoint",
-    "coordinates": [
-     [
-      55.03,
-      24.86
-     ],
-     [
-      55.56,
-      25.33
-     ]
-    ]
-   },
-   "properties": {}
-  }
- },
- "layer": [
-  {
-   "data": {
-    "url": "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/dubai.geojson",
-    "format": {
-     "type": "json",
-     "property": "features"
-    }
-   },
-   "transform": [
-    {
-     "calculate": "'None in the analysis window'",
-     "as": "note"
-    }
-   ],
-   "mark": {
-    "type": "geoshape",
-    "stroke": "white",
-    "strokeWidth": 0.6,
-    "clip": true
-   },
-   "encoding": {
-    "color": {
-     "datum": "No unit/villa sales",
-     "type": "ordinal",
-     "scale": {
-      "domain": [
-       "Under 10,000",
-       "10,000 – 13,000",
-       "13,000 – 16,000",
-       "16,000 – 20,000",
-       "20,000 – 30,000",
-       "30,000 and over",
-       "Fewer than 10 sales",
-       "No unit/villa sales"
-      ],
-      "range": [
-       "#ffffb2",
-       "#fed976",
-       "#feb24c",
-       "#fd8d3c",
-       "#f03b20",
-       "#bd0026",
-       "#a3a3a3",
-       "#e8e8e8"
-      ]
-     },
-     "title": "Median price (AED/m²)",
-     "legend": {
-      "orient": "left",
-      "titleLimit": 240,
-      "symbolType": "square",
-      "symbolSize": 160
-     }
-    },
-    "tooltip": [
-     {
-      "field": "properties.CNAME_E",
-      "title": "Community"
-     },
-     {
-      "field": "properties.COMM_NUM",
-      "title": "Community no."
-     },
-     {
-      "field": "note",
-      "title": "Unit/villa sales"
-     }
-    ]
-   }
-  },
-  {
-   "data": {
-    "url": "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/transactions.csv",
-    "format": {
-     "type": "csv",
-     "parse": {
-      "instance_date": "utc:'%Y-%m-%d'",
-      "meter_sale_price": "number",
-      "actual_worth": "number",
-      "procedure_area": "number",
-      "comm_num": "string"
-     }
-    }
-   },
-   "transform": [
-    {
-     "filter": {
-      "field": "instance_date",
-      "range": [
-       {
-        "year": 2015,
-        "month": 1,
-        "date": 1,
-        "utc": true
-       },
-       {
-        "year": 2026,
-        "month": 8,
-        "date": 31,
-        "utc": true
-       }
-      ]
-     }
-    },
-    {
-     "filter": "datum.trans_group_en === 'Sales' && (datum.property_type_en === 'Unit' || datum.property_type_en === 'Villa')"
-    },
-    {
-     "aggregate": [
-      {
-       "op": "count",
-       "as": "sales"
-      },
-      {
-       "op": "median",
-       "field": "meter_sale_price",
-       "as": "median_price"
+    <p><b>Is the map effective for finding it? No.</b><br>
+    The map uses colour to show the median price per m², not the number of sales. To find the busiest community, a reader has to hover over every community one by one. Al Barsha South Fourth is also mid-priced (light orange), so nothing makes it stand out, and large communities draw the eye whatever their sales. In Part 1, bubble size showed the number of sales, so the busiest area was easy to spot. A choropleth can use colour for only one measure. A bar chart of sales per community, sorted from highest to lowest, would show the answer at a glance.</p>
+
+    <p><b>How we made the colours reliable.</b><br>
+    Communities with fewer than 10 sales are shown in grey rather than coloured, because a median of so few sales is not reliable. For example, Al Barsha South First has a single sale at 3,189 AED/m², and colouring it would wrongly suggest a cheap area. Prices are also skewed: most communities sit between about 10,000 and 25,000 AED/m², but a few reach 75,000, so a continuous scale would make almost all communities look the same. We used six price classes with round boundaries (10k, 13k, 16k, 20k, 30k), which hold between 9 and 17 communities each, and a light-to-dark scale where darker means more expensive. Communities with no unit or villa sales are shown in light grey, so every community stays visible.</p>
+  </div>
+  <script>
+    // Shared data block and date filter (Member 1) — every chart uses these
+    const DATA = {
+      "url": "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/transactions.csv",
+      "format": {
+        "type": "csv",
+        "parse": {
+          "instance_date": "utc:'%Y-%m-%d'",
+          "meter_sale_price": "number",
+          "actual_worth": "number",
+          "procedure_area": "number",
+          "comm_num": "string"
+        }
       }
-     ],
-     "groupby": [
-      "comm_num"
-     ]
-    },
-    {
-     "lookup": "comm_num",
-     "from": {
-      "data": {
-       "url": "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/dubai.geojson",
-       "format": {
-        "type": "json",
-        "property": "features"
-       }
-      },
-      "key": "properties.COMM_NUM"
-     },
-     "as": "geo"
-    },
-    {
-     "filter": "isValid(datum.geo)"
-    },
-    {
-     "calculate": "datum.sales < 10 ? 'Fewer than 10 sales' : datum.median_price < 10000 ? 'Under 10,000' : datum.median_price < 13000 ? '10,000 – 13,000' : datum.median_price < 16000 ? '13,000 – 16,000' : datum.median_price < 20000 ? '16,000 – 20,000' : datum.median_price < 30000 ? '20,000 – 30,000' : '30,000 and over'",
-     "as": "price_class"
-    },
-    {
-     "calculate": "datum.geo.properties.CNAME_E",
-     "as": "community"
-    }
-   ],
-   "mark": {
-    "type": "geoshape",
-    "stroke": "white",
-    "strokeWidth": 0.6,
-    "clip": true
-   },
-   "encoding": {
-    "shape": {
-     "field": "geo",
-     "type": "geojson"
-    },
-    "color": {
-     "field": "price_class",
-     "type": "ordinal",
-     "title": "Median price (AED/m²)",
-     "scale": {
-      "domain": [
-       "Under 10,000",
-       "10,000 – 13,000",
-       "13,000 – 16,000",
-       "16,000 – 20,000",
-       "20,000 – 30,000",
-       "30,000 and over",
-       "Fewer than 10 sales",
-       "No unit/villa sales"
-      ],
-      "range": [
-       "#ffffb2",
-       "#fed976",
-       "#feb24c",
-       "#fd8d3c",
-       "#f03b20",
-       "#bd0026",
-       "#a3a3a3",
-       "#e8e8e8"
-      ]
-     }
-    },
-    "tooltip": [
-     {
-      "field": "community",
-      "title": "Community"
-     },
-     {
-      "field": "comm_num",
-      "title": "Community no."
-     },
-     {
-      "field": "sales",
-      "title": "Unit/villa sales",
-      "format": ","
-     },
-     {
-      "field": "median_price",
-      "title": "Median price (AED/m²)",
-      "format": ",.0f"
-     },
-     {
-      "field": "price_class",
-      "title": "Colour class"
-     }
-    ]
-   }
-  }
- ],
- "config": {
-  "view": {
-   "stroke": null
-  }
- }
-};
-const opts = {actions: {export: true, source: false, compiled: false, editor: true}};
-vegaEmbed('#task1', task1, opts);
-vegaEmbed('#task2', task2, opts);
-vegaEmbed('#task3', task3, opts);
-</script>
+    };
+    const WINDOW = {"filter": {"field": "instance_date", "range": [
+      {"year": 2015, "month": 1, "date": 1, "utc": true},
+      {"year": 2026, "month": 8, "date": 31, "utc": true}
+    ]}};
+
+    // TEMPORARY test chart in the Task 1 slot — will be replaced by Member 2's chart
+    const task1 = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+      "data": DATA,
+      "transform": [WINDOW],
+      "mark": {"type": "text", "fontSize": 40},
+      "encoding": {"text": {"aggregate": "count", "format": ","}}
+    };
+
+    vegaEmbed('#task1', task1);
+    // vegaEmbed('#task2', task2);   // switch on when Member 3's chart arrives
+    // vegaEmbed('#task3', task3);   // switch on when your Task 3 map is ready
+  </script>
 </body>
 </html>
