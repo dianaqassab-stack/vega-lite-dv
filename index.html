@@ -17,14 +17,14 @@
 </head>
 <body>
   <h1>Dubai Land Department transactions, 2015–2026</h1>
-  <p class="note">CS333 Part 2 (Vega-Lite). Group members: NAME 1, NAME 2, NAME 3, NAME 4, NAME 5.
+  <p class="note">CS333 Part 2 (Vega-Lite). Group members: Diana Alkassab, Masa Assaf, Maria Baghdadi, Sana Mathbut, Latifa Almatri.
   All charts use transactions registered from 1 January 2015 to 31 August 2026.
   Dates are read and grouped in UTC, so the results are the same in every time zone.</p>
 
   <h2>Task 1: Transactions by day of the week</h2>
   <div id="task1" class="chart"></div>
-  <div class="answer"><b>How many transactions were registered on Fridays?</b> (Member 2's answer)</div>
-
+  <div class="answer"><b>How many transactions were registered on Fridays?</b><br>
+  6,553 transactions were registered on Fridays between 1 January 2015 and 31 August 2026. Friday is low mainly because it was part of the UAE weekend until January 2022: there were only 299 Friday transactions in 2015–2021, then 740 in 2022, rising to about 1,750 a year in 2024–2025. No transactions fall on Saturday or Sunday, so both bars are zero, while Monday (20,126) is about 1.5 times any other day, probably because transactions build up over the weekend. Bars on a common baseline make these counts easy to compare, and the zero labels show the empty weekend days explicitly.</div>
   <h2>Task 2: Monthly sales, off-plan vs existing properties</h2>
   <div id="task2" class="chart"></div>
   <div class="answer"><b>Which month had the most off-plan sales?</b><br>
@@ -61,14 +61,77 @@
       {"year": 2026, "month": 8, "date": 31, "utc": true}
     ]}};
 
-    // TEMPORARY test chart in the Task 1 slot — will be replaced by Member 2's chart
     const task1 = {
-      "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
-      "data": DATA,
-      "transform": [WINDOW],
-      "mark": {"type": "text", "fontSize": 40},
-      "encoding": {"text": {"aggregate": "count", "format": ","}}
-    };
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Transactions by Day of the Week (1 Jan 2015 – 31 Aug 2026)",
+  "width": 600,
+  "height": 350,
+  "data": {
+    "url": "https://raw.githubusercontent.com/sharios/CS333/main/2026-27/Part%202/transactions.csv",
+    "format": {"type": "csv", "parse": {"instance_date": "utc:'%Y-%m-%d'"}}
+  },
+  "transform": [
+    {
+      "filter": "datum.instance_date >= utc(2015,0,1) && datum.instance_date <= utc(2026,7,31,23,59,59,999)"
+    },
+    {"calculate": "utcFormat(datum.instance_date, '%A')", "as": "day"},
+    {"aggregate": [{"op": "count", "as": "n"}], "groupby": ["day"]},
+    {
+      "impute": "n",
+      "key": "day",
+      "value": 0,
+      "keyvals": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ]
+    }
+  ],
+  "encoding": {
+    "x": {
+      "field": "day",
+      "type": "nominal",
+      "sort": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "title": "Day of the week",
+      "axis": {"labelAngle": 0}
+    },
+    "y": {
+      "field": "n",
+      "type": "quantitative",
+      "title": "Number of transactions"
+    }
+  },
+  "layer": [
+    {
+      "mark": "bar",
+      "encoding": {
+        "color": {"field": "day", "type": "nominal", "legend": null},
+        "tooltip": [
+          {"field": "day", "title": "Day"},
+          {"field": "n", "title": "Transactions", "format": ","}
+        ]
+      }
+    },
+    {
+      "mark": {"type": "text", "dy": -8},
+      "encoding": {
+        "text": {"field": "n", "type": "quantitative", "format": ","}
+      }
+    }
+  ]
+};
 
     vegaEmbed('#task1', task1);
     const task2 = {
